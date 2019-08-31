@@ -1,2 +1,4 @@
 *.dll
 *.cache
+.vs/PolygonAPI/v15/Server/sqlite3/storage.ide-wal
+.vs/PolygonAPI/v15/Server/sqlite3/storage.ide-shm
