@@ -20,7 +20,7 @@ sample data :
 ]
 }
 
-# delete polygon
+# Delete polygon
 request type :delete 
 
 url : {server}/api/Polymap/delete/{id}
