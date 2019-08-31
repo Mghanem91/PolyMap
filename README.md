@@ -1,5 +1,5 @@
 # PolyMap
-# export:
+# Export:
 {server}/api/Polymap/Export?data=1,2,3
 
 # Post new 
