@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using PolygonAPI.DTOs;
 using PolygonAPI.Models;
@@ -17,10 +18,11 @@ namespace PolygonAPI.Controllers
     public class PolymapController : ControllerBase
     {
         private readonly IPolymapServices _polymapService;
-
-        public PolymapController(IPolymapServices serv)
+        private readonly IConfiguration _config;
+        public PolymapController(IPolymapServices serv, IConfiguration config)
         {
             _polymapService = serv;
+            _config = config;
         }
 
         // GET api/values
@@ -28,10 +30,10 @@ namespace PolygonAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Export(string data)
         {
-            int[] arr = null;
+            int[] idsToExport = null;
             try
             {
-                arr = Array.ConvertAll(data.Split(","), id => int.Parse(id));
+                idsToExport = Array.ConvertAll(data.Split(","), id => int.Parse(id));
             }
             catch (NullReferenceException ex)
             {
@@ -41,28 +43,27 @@ namespace PolygonAPI.Controllers
             catch (FormatException ex)
             {
                 //TODO log ex
-                return StatusCode(500, "data should be numeric polygons ids seprated  by comma");
+                return StatusCode(500, "data parameter should be numeric polygons ids seprated  by comma");
             }
 
             ConcurrentBag<FileEntity> fileList = new ConcurrentBag<FileEntity>();
 
-            var polygonsRows = await _polymapService.ListPolygonsByIds(arr);
+            var polygonsRows = await _polymapService.ListPolygonsByIds(idsToExport);
 
-           
+            var apiKey = _config.GetSection("AppSettings").GetSection("MapApiKey").Value;
 
             Parallel.ForEach(polygonsRows, polygon =>
            {
-               //TODO api key should retrived from database or configration file.
-               fileList.Add(_polymapService.GetPdfFileForPolygon(PolygonUtilities.GetMapUrl(polygon.LocationCoordinates, "{api_key}"), polygon.Id));
+               fileList.Add(_polymapService.GetPdfFileForPolygon(PolygonUtilities.GetMapUrl(polygon.LocationCoordinates, apiKey), polygon.Id));
            });
 
             var response = PrepareFileContentRersult(fileList);
-            if(response != null)
+            if (response != null)
             {
                 return response;
             }
 
-             return StatusCode(404, "All polygon ids provided is not exists.");
+            return StatusCode(404, "All polygon ids provided is not exists.");
 
         }
 
