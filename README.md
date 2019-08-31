@@ -7,7 +7,7 @@ request type :post
 
 url : {server}/api/Polymap/post
 
-# sample data :
+sample data :
 {
   "UserId":"1002",
   "CoordinateList":
