@@ -26,5 +26,5 @@ request type :delete
 url : {server}/api/Polymap/delete/{id}
 
 # Notes
-sql files to create table and insert dummy data exists on teh root.
+sql files to create table and insert dummy data exists on the root.
 Performance may depend on internet connection because we fitched data from external links.
